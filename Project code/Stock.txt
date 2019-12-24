@@ -1,0 +1,8 @@
+
+Harry Potter,Jk Rowling,29,$2
+Start With Why,Simon Sinek,20,$1.5
+Programming With Python,John Smith,24,$1.5
+Rich Dad Poor Dad,Robert Kiyosaki,43,$1.81
+Freedom in Exile, Dalai Lama,84,$4.57
+My country My Life,L.K. Advani,92,$5.75
+The Lives Of Others,Neel Mukherjee,49,$4.60
