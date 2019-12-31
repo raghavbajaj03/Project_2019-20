@@ -3,40 +3,43 @@ import platform
 import sqlite3
 import requests,json 
 import PySimpleGUI as sg
+from datetime import datetime
 
 DEFAULT_PATH = os.path.join(os.path.dirname(__file__), 'SQLite_python.db')
 IMG_PATH = os.path.join(os.path.dirname(__file__), 'images')
-con=sqlite3.connect(DEFAULT_PATH)
 
 
 ############## Output Window ##############
-def call_gui(ct,cp,ch,desc,img):
+def call_gui(city_name,ct,cp,ch,desc,img):
     #sg.theme('DarkAmber')  # No gray windows please!
 
     # STEP 1 define the layout
     layout = [ 
+                [sg.Text('City Name: {}'.format(city_name))],
                 [sg.Text('Temprature: {}'.format(ct))],
+                [sg.Text('Pressure: {}'.format(cp))],
+                [sg.Text('Humidity: {}'.format(ch))],
+                
                 [sg.Image(img)],
                 [sg.Button('Button'), sg.Button('Exit')]
-            ]
-
-    #STEP 2 - create the window
+             ]
+   #STEP 2 - create the window
     window = sg.Window('My new window', layout, grab_anywhere=True)
 
     # STEP3 - the event loop
     while True:
-        event, values = window.read()   # Read the event that happened and the values dictionary
+        event, values = window.Read()   # Read the event that happened and the values dictionary
         print(event, values)
         if event in (None, 'Exit'):     # If user closeddow with X or if user clicked "Exit" button then exit
             break
         if event == 'Button':
             print('You pressed the button')
-    window.close()
-
+    window.Close()
 
 
 ############## Login Screen ##############    
 def LOGIN():
+    con=sqlite3.connect(DEFAULT_PATH)
     user_id=""
     password=""
     if(con):
@@ -72,16 +75,112 @@ def LOGIN():
         con.commit()
         print("Login Successful \n")
         break
+    display_city(user_id)
+    modify_city(user_id)
+    con.close()
+    
+def modify_city(user_id):
+    con=sqlite3.connect(DEFAULT_PATH)
+    if(con):
+        mycursor=con.cursor()
+    ch=input("Enter Choice y/n\n")
+    if ch=='y':
+        print("If you want to change city1 enter 1")
+        print("If you want to change city2 enter 2")
+        print("If you want to change city3 enter 3")
+        a=int(input("Enter your choice"))
+        if(a==1):
+            city1=input("Enter the name of new city in place of city1 : ")
+            val=(city1,user_id)
+            sql="update user_details set city1=? where user_id=?;"
+            mycursor.execute(sql,val)
+            con.commit()
+        elif(a==2):
+            city2=input("Enter the name of new city in place of city1 : ")
+            val=(city2,user_id)
+            sql="update user_details set city1=? where user_id=?;"
+            mycursor.execute(sql,val)
+            con.commit()
+        elif(a==3):
+            city3=input("Enter the name of new city in place of city1 : ")
+            val=(city3,user_id)
+            sql="update user_details set city1=? where user_id=?;"
+            mycursor.execute(sql,val)
+            con.commit()
+    con.close()
+                 
+def display_city(user_id):
+    con=sqlite3.connect(DEFAULT_PATH)
+    if(con):
+        mycursor=con.cursor()
     find_city1="SELECT city1 FROM user_details WHERE user_id=?;"
+    print("Getting the user id again from table ",user_id)
     mycursor.execute(find_city1,(user_id,))
     results=mycursor.fetchone()
-    if results:
+    if(results[0]==None):
+        city1=input("Kindly add city1 as it was not found in saved choice \n")
+        val=(city1,user_id)
+        sql="update user_details set city1=? where user_id=?;"
+        mycursor.execute(sql,val)
+        con.commit()
+        find_city1="SELECT city1 FROM user_details WHERE user_id=?;"
+        mycursor.execute(find_city1,(user_id,))
+        results=mycursor.fetchone()
+        con.commit()
+        print(results)
+    else:
         print(results)
         show_city_info(results[0])
+        
+        
+    find_city2="SELECT city2 FROM user_details WHERE user_id=?;"
+    print("Getting the user id again from table ",user_id)
+    mycursor.execute(find_city2,(user_id,))
+    results=mycursor.fetchone()
+    if(results[0]==None):
+        city2=input("Kindly add city2 as it was not found in saved choice \n")
+        val=(city2,user_id)
+        sql="update user_details set city2=? where user_id=?;"
+        mycursor.execute(sql,val)
+        con.commit()
+        find_city1="SELECT city2 FROM user_details WHERE user_id=?;"
+        mycursor.execute(find_city2,(user_id,))
+        results=mycursor.fetchone()
+        con.commit()
+        print(results)
+    else:
+        print(results)
+        show_city_info(results[0])
+    
+        
+    find_city3="SELECT city3 FROM user_details WHERE user_id=?;"
+    print("Getting the user id again from table ",user_id)
+    mycursor.execute(find_city3,(user_id,))
+    results=mycursor.fetchone()
+    if(results[0]==None):
+        city3=input("Kindly add city3 as it was not found in saved choice \n")
+        val=(city3,user_id)
+        sql="update user_details set city3=? where user_id=?;"
+        mycursor.execute(sql,val)
+        con.commit()
+        find_city1="SELECT city3 FROM user_details WHERE user_id=?;"
+        mycursor.execute(find_city3,(user_id,))
+        results=mycursor.fetchone()
+        con.commit()
+        print(results)
+    else:
+        print(results)
+        show_city_info(results[0])
+        
+           
+    print("Do you wish to update city\n")
+    print(input("\n Enter Your Choice Y/n"))
+    
     con.close()
 
 ############## Sign Up Screen ############## 
 def sign_up():
+    con=sqlite3.connect(DEFAULT_PATH)
     if(con):
         mycursor=con.cursor()
     while(1):
@@ -151,7 +250,7 @@ def guest_mode():
     #complete_url="http://api.openweathermap.org/data/2.5/weather?"+"appid"+api_key+"&q"+city_name
     response=requests.get(complete_url)
     x=response.json()
-    #print(x)
+    print(x)
     if x["cod"]!="404":
         y=x["main"]
         ct=y["temp"]-273.15
@@ -159,7 +258,9 @@ def guest_mode():
         ch=["humidity"]
         z=x["weather"]
         desc=z[0]["description"]
-        img=IMG_PATH+'/10d@2x.png'
+        w=z[0]["icon"]
+        print(w)
+        img=IMG_PATH+'/'+w+'@2x.png'
 
         print(" Temperature (in degree celcius) = " +
                     str(ct) + 
@@ -169,7 +270,7 @@ def guest_mode():
                     str(ch) +
           "\n description = " +
                     str(desc)) 
-        call_gui(ct,cp,ch,desc,img)
+        call_gui(city_name,ct,cp,ch,desc,img)
     else:
         print(" City Not Found ") 
    
