@@ -5,6 +5,16 @@ import requests,json
 import PySimpleGUI as sg
 from datetime import datetime
 
+import datetime
+ 
+currentDT = datetime.datetime.now()
+ 
+print (currentDT.strftime("%Y-%m-%d %H:%M:%S"))
+print (currentDT.strftime("%Y/%m/%d"))
+print (currentDT.strftime("%H:%M:%S"))
+print (currentDT.strftime("%I:%M:%S %p"))
+print (currentDT.strftime("%a, %b %d, %Y"))
+
 DEFAULT_PATH = os.path.join(os.path.dirname(__file__), 'SQLite_python.db')
 IMG_PATH = os.path.join(os.path.dirname(__file__), 'images')
 
@@ -15,16 +25,19 @@ def call_gui(city_name,ct,cp,ch,desc,img):
 
     # STEP 1 define the layout
     layout = [ 
-                [sg.Text('City Name: {}'.format(city_name))],
-                [sg.Text('Temprature: {}'.format(ct))],
+                [sg.Text('{}'.format(city_name))],
+                [sg.Text(currentDT.strftime(" %d %B,%Y  %A "))],
+                [sg.Text(currentDT.strftime("%H:%M:%S"))],
                 [sg.Text('Pressure: {}'.format(cp))],
                 [sg.Text('Humidity: {}'.format(ch))],
-                
                 [sg.Image(img)],
-                [sg.Button('Button'), sg.Button('Exit')]
+                [sg.Text(desc)],
+                #print("{0:.2f}".format(a))
+                [sg.Text('{0:.2f} Degree Celcius'.format(ct))],
+                [sg.Button('Exit')]
              ]
    #STEP 2 - create the window
-    window = sg.Window('My new window', layout, grab_anywhere=True)
+    window = sg.Window('Tempy', layout, no_titlebar=False, alpha_channel=.9,grab_anywhere=True)
 
     # STEP3 - the event loop
     while True:
@@ -32,8 +45,6 @@ def call_gui(city_name,ct,cp,ch,desc,img):
         print(event, values)
         if event in (None, 'Exit'):     # If user closeddow with X or if user clicked "Exit" button then exit
             break
-        if event == 'Button':
-            print('You pressed the button')
     window.Close()
 
 
@@ -225,7 +236,7 @@ def show_city_info(city):
         y=x["main"]
         current_temperature=y["temp"]
         current_pressure=y["pressure"]
-        current_humidity=["humidity"]
+        current_humidity=y["humidity"]
         z=x["weather"]
         weather_description=z[0]["description"]
         print(" Temperature (in kelvin unit) = " +
@@ -245,7 +256,7 @@ def guest_mode():
     #my api key
     api_key="ffed7bc78ee5dac9c811fd1393d88fc5"
     base_url="http://api.openweathermap.org/data/2.5/weather?"
-    city_name=input("Enter City Name:")
+    city_name=input("Enter City Name: ")
     complete_url=base_url + "appid=" + api_key + "&q=" + city_name
     #complete_url="http://api.openweathermap.org/data/2.5/weather?"+"appid"+api_key+"&q"+city_name
     response=requests.get(complete_url)
@@ -255,7 +266,7 @@ def guest_mode():
         y=x["main"]
         ct=y["temp"]-273.15
         cp=y["pressure"]
-        ch=["humidity"]
+        ch=y["humidity"]
         z=x["weather"]
         desc=z[0]["description"]
         w=z[0]["icon"]
