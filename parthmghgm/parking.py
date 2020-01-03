@@ -84,8 +84,8 @@ def add__record():
     print('-----------------------------------------------------------------------------------------------')
     print(' DATE:                                                                          ',dateofpark)
     print(' YOUR PARKING NO.:                                                              ',vid)
-    print(u' YOUR NAME:                                                                     ',pname)
-    print(u' YOUR VEHICLE NAME:                                                             ',vname)
+    print(u' YOUR NAME:                                                                     ',repr(pname))
+    print(u' YOUR VEHICLE NAME:                                                             ',repr(vname))
     print(' YOUR VEHICLE NO.:                                                              ',vehicleno1)
     print(' PER DAY CHARGE:                                                                ',perdaycharge)
     print(' NUMBER OF DAYS:                                                                ',nod1)    
@@ -139,7 +139,7 @@ def parking_table_view():
     print('DETAILS about parking are as follows:')
     print('Parking ID,Parking Name,Level,FreeSpace(Y/N),Vehicle No.,No. of days for parking,Payment')
     for x in res:
-        print(x)
+        print(repr(x))
 
 def checkout():
     vid=int(input('enter vid from receipt: '))
@@ -147,11 +147,12 @@ def checkout():
     sql='select * from parkmaster11 where vid=?'
     mycursor.execute(sql,s)  
     res=mycursor.fetchone()
-    datepark=res[10] 
+    li_pkdt=res[10].split("/")
+    datepark=date(int(li_pkdt[2]),int(li_pkdt[1]),int(li_pkdt[0]))
     li_dt=input('enter in format dd-mm-yyyy').split("-")
     dateofpick=date(int(li_dt[2]),int(li_dt[1]),int(li_dt[0]))
-    #diff=dateofpick-datepark
-    #diff=diff.days
+    diff=dateofpick-datepark
+    diff=diff.days
     vehtype=input('enter vehicle type car/bike/cycle/auto/bus/truck \n')
     if vehtype=='car':
         perdaycharge=250
@@ -165,8 +166,8 @@ def checkout():
         perdaycharge=350
     elif vehtype=='truck':
         perdaycharge=300
-    #penalty=diff*perdaycharge
-    penalty=0
+    penalty=diff*perdaycharge
+    #penalty=0
     payment=res[9]
     total_payment=penalty+payment
     print('-----------------------------------------------------------------------------------------------')
@@ -175,8 +176,8 @@ def checkout():
     print('-----------------------------------------------------------------------------------------------')
     print('  DATE:                                                                          ',dateofpick)
     print(' YOUR PARKING NO.:                                                               ',res[0])
-    print(u' YOUR NAME:                                                                      ',res[1])
-    print(u' YOUR VEHICLE NAME:                                                              ',res[2])
+    print(u' YOUR NAME:                                                                      ',repr(res[1]))
+    print(u' YOUR VEHICLE NAME:                                                              ',repr(res[2]))
     print(' YOUR VEHICLE NO.:                                                               ',res[5])
     print(' PER DAY CHARGE:                                                                 ',res[8])
     print(' NUMBER OF DAYS:                                                                 ',res[6])
